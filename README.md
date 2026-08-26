@@ -1,17 +1,30 @@
-# mcp-fmcsa
+# FMCSA — US Motor Carrier Registry & Safety
 
-FMCSA MCP — US motor-carrier (trucking/bus) registry & safety.
+Look up any US trucking or bus company by USDOT number, MC/docket number, or name, and pull its safety record: safety rating, out-of-service rates vs national averages, crash counts, and operating authority (including broker status).
 
-Part of [Pipeworx](https://pipeworx.io) — an MCP gateway connecting AI agents to 1394+ live data sources.
+Part of [Pipeworx](https://pipeworx.io) — an MCP gateway connecting AI agents to 1476+ live data sources.
 
 ## Tools
 
-| Tool | Description |
-|------|-------------|
-| `fmcsa_carrier_lookup` | Look up a US motor carrier (trucking/bus company) in the FMCSA census by USDOT number, MC/docket number, or company name. Keyless. Returns legal & DBA name, physical address, active/inactive status, interstate/intrastate operation, hazmat flag, fleet size (power units, trucks), driver counts, and cargo types carried. Set `by` to "dot", "mc", or "name" with the value in `value`. For carrier authority (broker status) use fmcsa_operating_authority; for safety scores use fmcsa_safety_snapshot. |
-| `fmcsa_search_carriers` | Search US motor carriers by company name (partial, case-insensitive) in the FMCSA census, ranked by fleet size. Keyless. Returns USDOT number, legal/DBA name, city/state, power units, drivers, and status. Optionally filter by 2-letter state. Use fmcsa_carrier_lookup for full detail on a returned USDOT number. |
-| `fmcsa_operating_authority` | Get a carrier's FMCSA operating authority by USDOT number: the MC docket number and the status of its common-carrier, contract-carrier, and broker authority (Active / Inactive / Pending / Revoked). Keyless. Answers "is this carrier authorized to operate / broker freight" — the legal authority to haul, complementing the census (fmcsa_carrier_lookup) and safety (fmcsa_safety_snapshot). |
-| `fmcsa_safety_snapshot` | Get the FMCSA safety profile for a carrier by USDOT number: safety rating, out-of-service status, driver/vehicle inspection & OOS rates, crash counts, and SMS BASIC categories (Unsafe Driving, HOS, Vehicle Maintenance, ...) with violation counts and percentiles. Requires an FMCSA webKey (free at mobile.fmcsa.dot.gov/QCDevsite/docs/apiAccess) — the gateway supplies a platform key, or pass your own via _apiKey. |
+| Tool | What it answers |
+|------|-----------------|
+| `fmcsa_carrier_lookup` | Who is this carrier? Legal/DBA name, address, status, fleet size, drivers, cargo types — by USDOT number, MC number, or name. |
+| `fmcsa_search_carriers` | Find carriers by name (partial match), ranked by fleet size, optional state filter. |
+| `fmcsa_operating_authority` | Is this carrier authorized to operate or broker freight? MC docket + common/contract/broker authority status. |
+| `fmcsa_safety_snapshot` | How safe is this carrier? Safety rating, driver/vehicle/hazmat out-of-service rates vs national averages, 24-month crash counts — plus SMS BASIC percentiles with a webKey. |
+
+## Auth
+
+Every tool works keyless. `fmcsa_safety_snapshot` uses the public SAFER Company Snapshot by default; pass a free FMCSA QCMobile webKey via `_apiKey` to add SMS BASIC category percentiles (Unsafe Driving, HOS Compliance, Vehicle Maintenance, ...). webKey signup (https://mobile.fmcsa.dot.gov/QCDevsite/docs/apiAccess) requires a login.gov account.
+
+Note: a carrier whose biennial MCS-150 update lapsed shows as `record_inactive` — FMCSA publishes no safety snapshot for inactive USDOT numbers. That's an upstream data gap, not an outage; `fmcsa_carrier_lookup` still returns the last filed census record.
+
+## Data sources
+
+- FMCSA Motor Carrier Census — https://data.transportation.gov/resource/az4n-8mr2 (Socrata, keyless)
+- FMCSA Operating Authority — https://data.transportation.gov/resource/6eyk-hxee (Socrata, keyless)
+- FMCSA SAFER Company Snapshot — https://safer.fmcsa.dot.gov/query.asp (keyless)
+- FMCSA QCMobile API — https://mobile.fmcsa.dot.gov/qc/services (webKey, optional)
 
 ## Quick Start
 
@@ -27,7 +40,25 @@ Add to your MCP client (Claude Desktop, Cursor, Windsurf, etc.):
 }
 ```
 
-Or connect to the full Pipeworx gateway for access to all 1394+ data sources:
+### What this endpoint actually serves
+
+`tools/list` at `https://gateway.pipeworx.io/fmcsa/mcp` returns the tools in the table
+above **plus the shared Pipeworx meta-tools** — `ask_pipeworx`,
+`discover_tools`, `search_within`, `remember`/`recall` and the rest of the
+gateway-wide set. So the tool count you see is larger than this table: a
+single-pack endpoint currently lists roughly 30 shared tools alongside the
+pack's own. The connection's `initialize` response states its exact scope, and
+is the authoritative answer for a given day.
+
+This is deliberate, not multiplexing by accident. The meta-tools are what let a
+scoped connection answer a question this pack does not cover — via
+`ask_pipeworx`, which routes across the whole catalog — without you adding a
+second MCP server. There is currently no way to mount a pack endpoint without
+them; if the extra schemas cost you more context than the routing is worth,
+connect to the full gateway once rather than to several pack endpoints.
+
+Or connect to the full Pipeworx gateway to get every pack's tools listed
+directly, instead of just this one's:
 
 ```json
 {
@@ -39,9 +70,14 @@ Or connect to the full Pipeworx gateway for access to all 1394+ data sources:
 }
 ```
 
+Both URLs reach the same gateway and the same 1476+ data sources. The
+only difference is which pack's tools are listed **directly**; `ask_pipeworx`
+reaches all of them from either one.
+
 ## Using with ask_pipeworx
 
-Instead of calling tools directly, you can ask questions in plain English:
+Instead of calling tools directly, you can ask questions in plain English —
+this works on the pack endpoint above as well as on the full gateway:
 
 ```
 ask_pipeworx({ question: "your question about Fmcsa data" })
