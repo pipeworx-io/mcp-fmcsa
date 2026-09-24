@@ -1,20 +1,32 @@
 {
   "name": "@pipeworx/mcp-fmcsa",
-  "version": "0.1.0",
-  "description": "US motor-carrier registry: DOT/MC/name lookup, operating authority, safety — keyless",
+  "version": "0.1.1",
+  "description": "FMCSA MCP — US motor-carrier (trucking/bus) registry & safety.",
   "type": "module",
   "main": "src/index.ts",
   "types": "src/index.ts",
+  "bin": {
+    "mcp-fmcsa": "bin/cli.js"
+  },
   "keywords": ["mcp", "mcp-server", "model-context-protocol", "pipeworx", "fmcsa"],
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/pipeworx-io/mcp-fmcsa"
+    "url": "git+https://github.com/pipeworx-io/mcp-fmcsa.git"
   },
   "scripts": {
     "typecheck": "tsc --noEmit"
   },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.30.0",
+    "tsx": "^4.19.0"
+  },
   "devDependencies": {
-    "typescript": "^5.7.0"
+    "typescript": "^5.9.3",
+    "@cloudflare/workers-types": "^4.20260405.1"
+  },
+  "pipeworx": {
+    "sourceHash": "v1-d447d78790d0a14849364164107eab4645fd5bffc3bae7caa1f76bd28a371513",
+    "sourceCommit": "76aa8f5d9b5dc2f665563030647c68e661478864"
   }
 }
