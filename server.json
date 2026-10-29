@@ -3,7 +3,7 @@
   "name": "io.github.pipeworx-io/fmcsa",
   "title": "Fmcsa",
   "description": "FMCSA MCP — US motor-carrier (trucking/bus) registry & safety.",
-  "version": "0.1.4",
+  "version": "0.2.0",
   "websiteUrl": "https://pipeworx.io/packs/fmcsa",
   "repository": {
     "url": "https://github.com/pipeworx-io/mcp-fmcsa",
