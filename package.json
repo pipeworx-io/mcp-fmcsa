@@ -1,6 +1,6 @@
 {
   "name": "@pipeworx/mcp-fmcsa",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "FMCSA MCP — US motor-carrier (trucking/bus) registry & safety.",
   "type": "module",
   "main": "lib/index.js",
@@ -27,7 +27,7 @@
     "mode": "gateway",
     "slug": "fmcsa",
     "gatewaySlug": "fmcsa",
-    "sourceHash": "v1-9a759a7d9496be4f0a8a0230de5c5dcd162b68eaaff9a37d385cc361f6fa9e9b",
-    "sourceCommit": "bb047243cf27f32453103de186b8e6a8b6a1ce79"
+    "sourceHash": "v1-fb8f2b025fe13fac96c98dcf54b635b31c47e711f239c711dee43e75e1e81d72",
+    "sourceCommit": "030233f6b150a38a44421f88a5fcbad123f0fea8"
   }
 }
